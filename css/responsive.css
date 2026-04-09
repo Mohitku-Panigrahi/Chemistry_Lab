@@ -1,0 +1,108 @@
+/* ===================== RESPONSIVE / MOBILE ===================== */
+
+/* Tablet: ≤ 1024px */
+@media (max-width: 1024px) {
+  .dashboard-layout { grid-template-columns: 220px 1fr; }
+  .chem-panel        { width: 200px; }
+  .custom-layout     { grid-template-columns: 1fr; }
+}
+
+/* Mobile: ≤ 768px */
+@media (max-width: 768px) {
+  /* Navbar */
+  #navbar {
+    padding: 0 16px;
+    height: 56px;
+  }
+  .nav-links { display: none; }
+  .nav-brand { font-size: 1rem; }
+  .nav-user  { margin-left: auto; }
+
+  /* Login */
+  .login-container { padding: 32px 24px; }
+  .form-grid { grid-template-columns: 1fr; }
+
+  /* Class Select */
+  #view-classSelect { padding: 70px 16px 40px; }
+  .class-grid       { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+
+  /* Dashboard */
+  #view-dashboard { padding: 56px 0 0; }
+  .dashboard-layout { grid-template-columns: 1fr; }
+  .dash-sidebar   { display: none; }
+  .dash-main      { padding: 16px; }
+  .dash-class-info { flex-wrap: wrap; gap: 12px; }
+  .dash-class-actions { margin-left: 0; width: 100%; justify-content: flex-end; }
+  .equipment-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .exp-cards-grid { grid-template-columns: 1fr; }
+
+  /* Simulation */
+  #view-simulation { padding-top: 56px; }
+  .sim-topbar      { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
+  .sim-tabs        { margin-left: 0; }
+  .sim-nav-btns    { margin-left: auto; }
+  .sim-layout      { flex-direction: column; }
+  .chem-panel      {
+    width: 100%; height: 160px; border-right: none;
+    border-bottom: 1px solid var(--border);
+    flex-direction: row; overflow-x: auto; overflow-y: hidden;
+  }
+  .chem-panel-header { flex-shrink: 0; border-bottom: none; border-right: 1px solid var(--border); }
+  .chem-search    { width: 120px; margin: 8px; }
+  #chem-panel-list { display: flex; flex-direction: row; align-items: center; gap: 4px; padding: 8px; overflow-x: auto; white-space: nowrap; }
+  .chem-category  { display: none; }
+  .chem-item      { flex-shrink: 0; border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; }
+  .chem-formula   { display: none; }
+
+  .sim-tools { width: 100%; flex-direction: row; height: 56px; padding: 8px; border-left: none; border-top: 1px solid var(--border); overflow-x: auto; }
+  .tool-btn  { width: 36px; height: 36px; flex-shrink: 0; }
+
+  .bench-actions { bottom: 180px; right: 12px; left: 12px; justify-content: flex-end; }
+  .undo-redo-btns { left: 12px; bottom: 180px; }
+  .save-load-btns { display: none; }  /* Simplified on mobile */
+  .mix-react-btn  { padding: 10px 16px; font-size: 0.8rem; }
+  .clear-bench-btn { display: none; }
+
+  .reaction-log { height: 100px; }
+  .reaction-overlay { width: calc(100vw - 40px); min-width: unset; padding: 20px; }
+
+  /* Results */
+  #view-results  { padding: 70px 16px 40px; }
+  .results-grid  { grid-template-columns: 1fr; }
+
+  /* Custom Exp */
+  #view-custom   { padding: 70px 16px 40px; }
+  .custom-layout { grid-template-columns: 1fr; }
+
+  /* Chatbot */
+  #chat-window { width: calc(100vw - 20px); right: 10px; bottom: 80px; height: 70vh; }
+  #chat-fab    { bottom: 16px; right: 16px; }
+}
+
+/* Small mobile: ≤ 480px */
+@media (max-width: 480px) {
+  .class-grid     { grid-template-columns: repeat(2, 1fr); }
+  .nav-avatar     { display: none; }
+  .login-logo h1  { font-size: 1.5rem; }
+}
+
+/* ===================== PRINT STYLES ===================== */
+@media print {
+  #navbar, #chat-fab, #chat-window, #mol-canvas,
+  .sim-tools, .bench-actions, .undo-redo-btns, .save-load-btns,
+  .reaction-log { display: none !important; }
+
+  body { background: white; color: black; }
+  .result-card { border: 1px solid #ccc; break-inside: avoid; }
+  .results-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ===================== HIGH CONTRAST / REDUCED MOTION ===================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  #mol-canvas { display: none; }
+}
+
+@media (prefers-color-scheme: light) {
+  /* The app is dark-mode native; light-mode users still get dark UI */
+}
