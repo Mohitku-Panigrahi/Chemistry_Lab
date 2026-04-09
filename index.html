@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="ChemLab Pro — Virtual Chemistry Laboratory for Students" />
+  <meta name="theme-color" content="#070d1a" />
+  <title>ChemLab Pro — Virtual Chemistry Lab</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Styles (modular) -->
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/chatbot.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+
+<!-- =================== MOLECULAR BACKGROUND =================== -->
+<canvas id="mol-canvas" aria-hidden="true"></canvas>
+
+<!-- =================== NAVBAR =================== -->
+<nav id="navbar" class="hidden" role="navigation" aria-label="Main navigation" aria-hidden="true">
+  <a href="#" class="nav-brand" aria-label="ChemLab Pro home" id="nav-brand">
+    ⚗ CHEM<span>LAB</span> PRO
+  </a>
+
+  <div class="nav-links" role="menubar">
+    <button class="nav-link" id="nav-dashboard"  role="menuitem" aria-label="Dashboard">📊 Dashboard</button>
+    <button class="nav-link" id="nav-simulation" role="menuitem" aria-label="Simulation">🧪 Simulation</button>
+    <button class="nav-link" id="nav-free"       role="menuitem" aria-label="Free Mode">⚡ Free Mode</button>
+    <button class="nav-link" id="nav-results"    role="menuitem" aria-label="Results">📈 Results</button>
+    <button class="nav-link" id="nav-custom"     role="menuitem" aria-label="Custom Experiment">🔬 Custom</button>
+  </div>
+
+  <div class="nav-user" aria-label="User info">
+    <div class="nav-avatar" id="nav-avatar" aria-hidden="true">U</div>
+    <span id="nav-username" aria-live="polite">User</span>
+    <button class="btn btn-ghost" id="nav-logout" style="padding:6px 14px;font-size:0.8rem;" aria-label="Log out">
+      ⏻ Logout
+    </button>
+  </div>
+</nav>
+
+<!-- =================== VIEW: LOGIN =================== -->
+<main id="view-login" class="view" role="main" aria-label="Login page">
+  <div class="login-container">
+    <div class="login-logo" aria-label="ChemLab Pro logo">
+      <h1>⚗ CHEMLAB PRO</h1>
+      <p>Virtual Chemistry Laboratory · Student Edition</p>
+    </div>
+
+    <div class="login-decoration">
+      <span>STUDENT LOGIN</span>
+    </div>
+
+    <p id="login-err" role="alert" aria-atomic="true" style="display:none"></p>
+
+    <form id="login-form" novalidate aria-label="Student login form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="inp-name">Full Name <span aria-label="required">*</span></label>
+          <input type="text" id="inp-name" name="name" placeholder="Your full name"
+            required aria-required="true" autocomplete="name"
+            minlength="2" maxlength="60" />
+        </div>
+        <div class="form-group">
+          <label for="inp-roll">Roll Number <span aria-label="required">*</span></label>
+          <input type="text" id="inp-roll" name="roll" placeholder="e.g. 21CHE01"
+            required aria-required="true" autocomplete="off"
+            minlength="3" maxlength="20" pattern="[A-Za-z0-9\-\/]{3,20}" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inp-email">Email Address <span aria-label="required">*</span></label>
+        <input type="email" id="inp-email" name="email" placeholder="student@college.edu"
+          required aria-required="true" autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label for="inp-college">College / Institution <span aria-label="required">*</span></label>
+        <input type="text" id="inp-college" name="college" placeholder="Name of your college"
+          required aria-required="true" autocomplete="organization"
+          minlength="3" maxlength="100" />
+      </div>
+      <div class="form-group">
+        <label for="inp-mobile">Mobile Number <span aria-label="required">*</span></label>
+        <input type="tel" id="inp-mobile" name="mobile" placeholder="+91 XXXXX XXXXX"
+          required aria-required="true" autocomplete="tel" />
+      </div>
+
+      <button type="submit" class="btn btn-primary login-btn" aria-label="Enter the laboratory">
+        ⚗ Enter Laboratory
+      </button>
+    </form>
+  </div>
+</main>
+
+<!-- =================== VIEW: CLASS SELECT =================== -->
+<div id="view-classSelect" class="view hidden" role="main" aria-label="Class selection" aria-hidden="true">
+  <div class="class-header">
+    <h2>SELECT YOUR CLASS</h2>
+    <p>Choose your education level to access relevant experiments</p>
+  </div>
+  <section class="class-grid" id="class-grid-container" aria-label="Available classes"></section>
+</div>
+
+<!-- =================== VIEW: DASHBOARD =================== -->
+<div id="view-dashboard" class="view hidden" role="main" aria-label="Dashboard" aria-hidden="true">
+  <div class="dashboard-layout">
+
+    <!-- Sidebar -->
+    <aside class="dash-sidebar" aria-label="Experiments sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label" id="exp-class-name">EXPERIMENTS</div>
+        <div id="sidebar-exp-list" role="list" aria-label="Experiment list"></div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">QUICK ACTIONS</div>
+        <button class="btn btn-primary" id="btn-open-sim" style="width:100%;justify-content:center;padding:10px;font-size:0.85rem;" aria-label="Open simulation lab">
+          🧪 Open Lab
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="dash-main" role="region" aria-label="Dashboard content">
+      <!-- Class Info Banner -->
+      <div class="dash-class-info" aria-live="polite">
+        <div>
+          <h2 id="dash-class-title">Class</h2>
+          <p id="dash-class-desc">Description</p>
+        </div>
+        <div class="dash-class-actions">
+          <button class="btn btn-ghost" id="btn-change-class" aria-label="Change class">
+            🔄 Change Class
+          </button>
+          <button class="btn btn-primary" id="btn-open-sim-2" aria-label="Open simulation">
+            🧪 Open Lab
+          </button>
+        </div>
+      </div>
+
+      <!-- Equipment Section -->
+      <section aria-labelledby="equip-section-title">
+        <div class="section-title" id="equip-section-title">
+          🔬 LABORATORY EQUIPMENT
+        </div>
+        <div class="equipment-grid" id="equipment-grid" role="list" aria-label="Lab equipment"></div>
+      </section>
+
+      <!-- Experiments Section -->
+      <section aria-labelledby="exp-section-title" style="margin-top:32px;">
+        <div class="section-title" id="exp-section-title">
+          ⚗ EXPERIMENTS
+        </div>
+        <div class="exp-cards-grid" id="exp-cards-grid" role="list" aria-label="Experiment cards"></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- =================== VIEW: SIMULATION =================== -->
+<div id="view-simulation" class="view hidden" role="main" aria-label="Simulation lab" aria-hidden="true">
+
+  <!-- Top Bar -->
+  <div class="sim-topbar" role="toolbar" aria-label="Simulation controls">
+    <div>
+      <div class="sim-mode-title" id="sim-mode-title">🧪 SIMULATION LAB</div>
+      <div class="sim-mode-sub">VIRTUAL CHEMISTRY BENCH</div>
+    </div>
+    <div class="sim-tabs" role="tablist" aria-label="Simulation mode tabs">
+      <button class="sim-tab active" id="tab-guided" data-tab="guided"
+        role="tab" aria-selected="true" aria-label="Guided mode">
+        📋 Guided
+      </button>
+      <button class="sim-tab" id="tab-free" data-tab="free"
+        role="tab" aria-selected="false" aria-label="Free explore mode">
+        ⚡ Free Explore
+      </button>
+    </div>
+    <div class="sim-nav-btns">
+      <button class="btn btn-ghost" id="btn-sim-back" style="padding:7px 16px;font-size:0.82rem;" aria-label="Back to dashboard">
+        ← Dashboard
+      </button>
+      <button class="btn btn-primary" id="btn-sim-results" style="padding:7px 16px;font-size:0.82rem;" aria-label="View results">
+        📊 Results
+      </button>
+    </div>
+  </div>
+
+  <!-- Simulation Layout -->
+  <div class="sim-layout" role="region" aria-label="Lab workspace">
+
+    <!-- Chemical Panel -->
+    <aside class="chem-panel" role="complementary" aria-label="Chemicals panel">
+      <div class="chem-panel-header">
+        🧪 CHEMICALS
+      </div>
+      <input
+        type="search" id="chem-search-inp" class="chem-search"
+        placeholder="Search chemicals…"
+        aria-label="Search chemicals"
+        autocomplete="off"
+      />
+      <div id="chem-panel-list" role="list" aria-label="Available chemicals"></div>
+    </aside>
+
+    <!-- Bench -->
+    <div class="sim-bench" id="sim-bench"
+      role="region" aria-label="Lab bench — drag chemicals here to react"
+      aria-dropeffect="copy">
+
+      <div class="bench-grid" aria-hidden="true"></div>
+      <div class="bench-instruction" aria-hidden="true">
+        ◉ DRAG CHEMICALS FROM PANEL · <span>REACTION ZONE</span>
+      </div>
+
+      <!-- Beaker drop zone -->
+      <div id="bench-drop-zone" aria-label="Chemical beakers on bench" role="list"></div>
+
+      <!-- Empty state hint -->
+      <div class="bench-empty-hint" id="bench-hint" aria-hidden="true">
+        <div class="hint-icon">⚗</div>
+        <p>Drag chemicals here to begin</p>
+      </div>
+
+      <!-- Reaction overlay -->
+      <div id="reaction-overlay-container" aria-live="assertive"></div>
+
+      <!-- Bench action buttons -->
+      <div class="bench-actions" role="group" aria-label="Bench actions">
+        <button class="mix-react-btn" id="mix-btn" aria-label="Mix chemicals and start reaction">
+          ⚡ MIX & REACT
+        </button>
+        <button class="clear-bench-btn" id="clear-btn" aria-label="Clear bench">
+          🗑 Clear
+        </button>
+      </div>
+
+      <!-- Undo / Redo -->
+      <div class="undo-redo-btns" role="group" aria-label="Undo and redo">
+        <button class="btn btn-ghost" id="undo-btn" style="padding:6px 12px;font-size:0.8rem;" aria-label="Undo last action" disabled>
+          ↩ Undo
+        </button>
+        <button class="btn btn-ghost" id="redo-btn" style="padding:6px 12px;font-size:0.8rem;" aria-label="Redo last action" disabled>
+          ↪ Redo
+        </button>
+      </div>
+
+      <!-- Save / Load -->
+      <div class="save-load-btns" role="group" aria-label="Save and load experiment">
+        <button class="btn btn-ghost" id="save-exp-btn" style="padding:6px 12px;font-size:0.8rem;" aria-label="Save experiment (Ctrl+S)">
+          💾 Save
+        </button>
+        <button class="btn btn-ghost" id="load-exp-btn" style="padding:6px 12px;font-size:0.8rem;" aria-label="Load saved experiment">
+          📂 Load
+        </button>
+      </div>
+
+      <!-- Reaction Log -->
+      <div class="reaction-log" role="log" aria-label="Reaction log" aria-live="polite">
+        <div class="log-header">
+          <span class="log-header-title">📋 REACTION LOG</span>
+          <div class="log-actions">
+            <button class="btn btn-ghost" id="clear-log-btn" style="padding:4px 12px;font-size:0.75rem;" aria-label="Clear reaction log">
+              Clear Log
+            </button>
+          </div>
+        </div>
+        <div class="log-entries" id="log-entries" aria-label="Log entries"></div>
+      </div>
+    </div>
+
+    <!-- Tool Panel -->
+    <div class="sim-tools" role="toolbar" aria-label="Lab tools">
+      <button class="tool-btn" id="heat-btn"    title="Bunsen Burner (toggle)" aria-label="Toggle Bunsen burner" aria-pressed="false">🔥</button>
+      <button class="tool-btn" id="stir-btn"    title="Stir"   aria-label="Stir mixture">🌀</button>
+      <button class="tool-btn" id="filter-btn"  title="Filter" aria-label="Apply filtration">⚗</button>
+      <button class="tool-btn" id="ph-btn"      title="pH Meter" aria-label="Measure pH">🌡</button>
+      <button class="tool-btn" id="dropper-btn" title="Dropper" aria-label="Use dropper">💧</button>
+      <button class="tool-btn" id="camera-btn"  title="Capture observation" aria-label="Capture observation">📷</button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== VIEW: RESULTS =================== -->
+<div id="view-results" class="view hidden" role="main" aria-label="Experiment results" aria-hidden="true">
+  <div class="results-header">
+    <h2>📊 EXPERIMENT RESULTS</h2>
+    <p style="color:var(--text2);margin-top:8px;" id="result-exp-name" aria-live="polite">Results will appear after a reaction</p>
+  </div>
+
+  <div style="max-width:1100px;margin:0 auto;">
+    <!-- Equation display -->
+    <div class="chem-eq-display" id="result-eq" aria-label="Chemical equation" role="status">
+      No reaction yet — run a simulation first
+    </div>
+
+    <!-- pH Bar -->
+    <section aria-labelledby="ph-section-title" style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px;">
+      <div class="section-title" id="ph-section-title" style="font-size:0.82rem;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;border:none;padding:0;">
+        pH Scale
+      </div>
+      <div class="ph-bar" role="img" aria-label="pH scale indicator">
+        <div class="ph-indicator" id="ph-indicator" style="left:50%" aria-label="Current pH position"></div>
+      </div>
+      <div class="ph-labels" aria-hidden="true">
+        <span>0 (Strong Acid)</span><span>3</span><span>5</span>
+        <span>7 (Neutral)</span><span>9</span><span>11</span>
+        <span>14 (Strong Base)</span>
+      </div>
+      <div style="text-align:center;margin-top:14px;">
+        <span style="font-family:var(--font-mono);font-size:1.6rem;color:var(--cyan);" id="ph-value" aria-label="pH value">7.0</span>
+        <span style="color:var(--text2);margin-left:8px;font-size:0.9rem;" id="ph-type" aria-live="polite">Neutral</span>
+      </div>
+    </section>
+
+    <div class="results-grid" id="results-grid" role="region" aria-label="Detailed results"></div>
+
+    <div style="text-align:center;margin-top:20px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="btn-new-sim"   aria-label="Start new simulation">🔁 New Simulation</button>
+      <button class="btn btn-ghost"   id="btn-custom-exp" aria-label="Open custom experiment">🔬 Custom Experiment</button>
+      <button class="btn btn-ghost"   id="btn-print"      aria-label="Print report">🖨 Print Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== VIEW: CUSTOM EXPERIMENT =================== -->
+<div id="view-custom" class="view hidden" role="main" aria-label="Custom experiment builder" aria-hidden="true">
+  <div class="custom-header">
+    <h2>🔬 CUSTOM EXPERIMENT BUILDER</h2>
+    <p style="color:var(--text2);margin-top:8px;">Design your own experiment — mix any chemicals and analyse results</p>
+  </div>
+  <div class="custom-layout">
+    <!-- Controls Panel -->
+    <div class="custom-panel">
+      <h3>SELECT CHEMICALS</h3>
+
+      <div style="font-size:0.8rem;color:var(--text3);margin-bottom:12px;">Reactant 1</div>
+      <div class="chem-select-grid" id="custom-chem1" role="radiogroup" aria-label="Select first reactant"></div>
+
+      <div style="font-size:0.8rem;color:var(--text3);margin-bottom:12px;margin-top:16px;">Reactant 2</div>
+      <div class="chem-select-grid" id="custom-chem2" role="radiogroup" aria-label="Select second reactant"></div>
+
+      <div class="slider-row">
+        <label for="conc-slider">Concentration (mol/L)</label>
+        <input type="range" id="conc-slider" min="0.1" max="5" step="0.1" value="1"
+          style="width:100%;accent-color:var(--cyan);"
+          aria-label="Concentration in mol per liter" aria-valuemin="0.1" aria-valuemax="5" />
+        <div class="slider-val-row" style="color:var(--cyan);">
+          <span id="conc-val">1.0</span> mol/L
+        </div>
+      </div>
+
+      <div class="slider-row">
+        <label for="temp-slider">Temperature (°C)</label>
+        <input type="range" id="temp-slider" min="0" max="200" step="5" value="25"
+          style="width:100%;accent-color:var(--orange);"
+          aria-label="Temperature in degrees Celsius" aria-valuemin="0" aria-valuemax="200" />
+        <div class="slider-val-row" style="color:var(--orange);">
+          <span id="temp-val">25</span> °C
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="run-custom-btn"
+        style="width:100%;justify-content:center;margin-top:20px;"
+        aria-label="Run custom experiment">
+        ⚡ Run Experiment
+      </button>
+    </div>
+
+    <!-- Results Panel -->
+    <div class="custom-panel">
+      <h3>RESULTS &amp; ANALYSIS</h3>
+      <div class="custom-result" id="custom-result-box" role="status" aria-live="polite">
+        <p style="color:var(--text3);text-align:center;padding:30px 0;">
+          Select chemicals and run the experiment to see results
+        </p>
+      </div>
+      <div id="custom-gmw-box" style="margin-top:14px;" aria-live="polite"></div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== CHATBOT =================== -->
+
+<!-- Floating Toggle Button -->
+<button id="chat-fab" aria-label="Open ChemBot AI tutor" aria-haspopup="dialog" aria-expanded="false">
+  <div class="fab-ring" aria-hidden="true"></div>
+  <div class="fab-icon" id="fab-icon" aria-hidden="true">🤖</div>
+  <div class="fab-badge" id="fab-badge" style="display:none" aria-hidden="true">1</div>
+</button>
+
+<!-- Chat Window -->
+<div id="chat-window" class="chat-hidden"
+  role="dialog" aria-modal="true" aria-label="ChemBot AI chemistry tutor"
+  aria-hidden="true">
+
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <div class="chat-avatar-pulse" aria-hidden="true">
+        <div class="chat-avatar-inner">⚗</div>
+      </div>
+      <div>
+        <div class="chat-title">ChemBot AI</div>
+        <div class="chat-status" id="chat-status" aria-live="polite">
+          <span class="status-dot"></span> Ready to help
+        </div>
+      </div>
+    </div>
+    <div class="chat-header-right">
+      <button class="chat-tool-btn" id="clear-chat-btn" title="Clear chat" aria-label="Clear chat history">🗑</button>
+      <button class="chat-tool-btn" id="close-chat-btn" title="Minimize" aria-label="Close chat">✕</button>
+    </div>
+  </div>
+
+  <div class="chat-context-bar" aria-live="polite">
+    <span id="chat-context-text">💡 Ask me anything about chemistry!</span>
+  </div>
+
+  <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Chat messages"></div>
+
+  <div class="chat-suggestions" id="chat-suggestions" aria-label="Suggested questions">
+    <button class="suggestion-chip">What is pH?</button>
+    <button class="suggestion-chip">Explain acid-base titration</button>
+    <button class="suggestion-chip">How does electrolysis work?</button>
+    <button class="suggestion-chip">What is molarity?</button>
+  </div>
+
+  <div class="chat-input-area">
+    <label for="chat-input" class="sr-only">Type your chemistry question</label>
+    <textarea
+      id="chat-input"
+      placeholder="Ask about any chemistry topic, reaction, or experiment…"
+      rows="1"
+      aria-label="Chemistry question input"
+      aria-multiline="true"
+    ></textarea>
+    <button class="chat-send-btn" id="chat-send-btn" aria-label="Send message">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
+  </div>
+
+  <div class="chat-footer">
+    Powered by <strong>Claude AI</strong> · Chemistry Expert Mode
+  </div>
+</div>
+
+<!-- =================== SCRIPTS (modular, in dependency order) =================== -->
+<script src="js/data.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/simulation.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
